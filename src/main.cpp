@@ -1,41 +1,48 @@
-//Arquivo da main responsável por ler o arquivo de entrada e chamar executar as operações do grafo
-
-
 #include <iostream>
 #include <fstream>
-using namespace std;
+#include <string>
+#include <sstream>
 
 int main() {
-    Grafo grafo;
-
-    cout << "Digite a função que deseja executar: " << endl;
-    cout << "1 - Distância entre dois vértices" << endl;
-    // Botar mais opções
-
-    cout << "6 - Distancia e caminhos mínimos" << endl;
-
-    int opcao;
-
-    cin >> opcao;
-
-    switch(opcao) {
-        case 1:
-            cout << "Voce selecionou a opção 1" << endl;
-            // ...
-            break;
-        case 6:
-            cout << "Voce selecionou a opção 6" << endl;
-            int verticeRaiz;
-            cout << "Digite o vértice raiz: " << endl;
-            cin >> verticeRaiz;
-
-            grafo.dijkstra(verticeRaiz);
-    }       
-
     
+    std::locale::global(std::locale("C")); // Definir a localização "C" para usar o ponto como separador decimal
 
+    std::ifstream arquivo("entrada.txt");
+    bool pesoNegativoEncontrado = false;
 
+    if (arquivo.is_open()) {
+        std::string linha;
 
+        // Ler a primeira linha que contém apenas um número
+        std::getline(arquivo, linha);
+
+        while (std::getline(arquivo, linha)) {
+            std::istringstream iss(linha);
+            int origem, destino;
+            double peso;
+
+            if (!(iss >> origem >> destino >> peso)) {
+                std::cerr << "Erro ao ler o arquivo." << std::endl;
+                return 1;
+            }
+
+            if (peso < 0) {
+                pesoNegativoEncontrado = true;
+                break;  // Parar a leitura após encontrar um peso negativo
+            }
+        }
+        arquivo.close();
+
+        if (pesoNegativoEncontrado) {
+            std::cout << "Esta biblioteca ainda não implementa caminhos minimos com pesos negativos" << std::endl;
+        } else {
+            std::cout << "O grafo não possui arestas com peso negativo." << std::endl; 
+            //Utilizar o algoritmo de dijkastra para encontrar a distancia de um vertice qualquer para todos os outros vertices do grafo
+            //Utilizar o algoritmo de dijkastra para encontrar os caminhos minimos (arvore geradora induzida pela busca)
+        }
+    } else {
+        std::cerr << "Erro ao abrir o arquivo." << std::endl;
+    }
 
     return 0;
 }
