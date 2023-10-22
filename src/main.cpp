@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int V = 6;
+int V = 10001;
 
 int encontrarVerticeMenorDistancia(const vector<double> &distancias, const set<int> &naoVisitados) {
     double menorDistancia = numeric_limits<double>::max();
@@ -18,7 +18,7 @@ int encontrarVerticeMenorDistancia(const vector<double> &distancias, const set<i
 
     for (int v = 0; v < V; v++) {
         if (naoVisitados.count(v) && distancias[v] <= menorDistancia) {
-            menorDistancia = distancias[v];
+            menorDistancia = distancias[v]; //distancias - armazena as estimativas de distancia pra cada vertice
             verticeMenorDistancia = v;
         }
     }
@@ -71,7 +71,7 @@ void dijkstra(vector<vector<double>> &grafo, int origem) {
 
 int main() {
     std::locale::global(std::locale("C"));
-    std::ifstream arquivo("entrada.txt");
+    std::ifstream arquivo("grafo_W_1.txt");
     bool pesoNegativoEncontrado = false;
 
     if (arquivo.is_open()) {
