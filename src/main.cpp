@@ -10,13 +10,13 @@
 
 using namespace std;
 
-int V = 10001;
+int numeroVerticesGrafo;
 
 int encontrarVerticeMenorDistancia(const vector<double> &distancias, const set<int> &naoVisitados) {
     double menorDistancia = numeric_limits<double>::max();
     int verticeMenorDistancia = -1;
 
-    for (int v = 0; v < V; v++) {
+    for (int v = 0; v < numeroVerticesGrafo; v++) {
         if (naoVisitados.count(v) && distancias[v] <= menorDistancia) {
             menorDistancia = distancias[v]; //distancias - armazena as estimativas de distancia pra cada vertice
             verticeMenorDistancia = v;
@@ -32,7 +32,7 @@ void imprimirSolucao(const vector<double> &distancias, int origem) {
     cout << "------------------------------------------" << endl;
 
     cout << left << setw(10) << "Vértice" << "Distância da Origem" << endl;
-    for (int i = 0; i < V; i++) {
+    for (int i = 0; i < numeroVerticesGrafo; i++) {
         cout << left << setw(10) << i;
         if (distancias[i] == numeric_limits<double>::max()) {
             cout << "Não há caminho do vértice " << origem << " para o vértice " << i << endl;
@@ -43,12 +43,12 @@ void imprimirSolucao(const vector<double> &distancias, int origem) {
 }
 
 void dijkstra(vector<vector<double>> &grafo, int origem) {
-    vector<double> distancias(V, numeric_limits<double>::max());
+    vector<double> distancias(numeroVerticesGrafo, numeric_limits<double>::max());
     set<int> naoVisitados;
 
     distancias[origem] = 0;
 
-    for (int i = 0; i < V; i++) {
+    for (int i = 0; i < numeroVerticesGrafo; i++) {
         naoVisitados.insert(i);
     }
 
@@ -56,7 +56,7 @@ void dijkstra(vector<vector<double>> &grafo, int origem) {
         int u = encontrarVerticeMenorDistancia(distancias, naoVisitados);
         naoVisitados.erase(u);
 
-        for (int v = 0; v < V; v++) {
+        for (int v = 0; v < numeroVerticesGrafo; v++) {
             if (grafo[u][v] > 0) {
                 double distanciaTotal = distancias[u] + grafo[u][v];
                 if (distanciaTotal < distancias[v]) {
@@ -77,9 +77,9 @@ int main() {
     if (arquivo.is_open()) {
         std::string linha;
         std::getline(arquivo, linha);
-        int numArestas = stoi(linha);
+        numeroVerticesGrafo = stoi(linha)+1;
 
-        vector<vector<double>> grafo(V, vector<double>(V, 0.0));
+        vector<vector<double>> grafo(numeroVerticesGrafo, vector<double>(numeroVerticesGrafo, 0.0));
 
         while (std::getline(arquivo, linha)) {
             std::istringstream iss(linha);
