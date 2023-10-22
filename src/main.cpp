@@ -7,12 +7,11 @@
 #include <iomanip>
 #include <limits>
 #include <set>
+#include <chrono>
 
 using namespace std;
 
 int numeroVerticesGrafo;
-vector<vector<double>> matrizAdjacencia;
-vector<vector<pair<int, double>>> listaAdjacencia;
 
 int encontrarVerticeMenorDistancia(const vector<double> &distancias, const set<int> &naoVisitados) {
     double menorDistancia = numeric_limits<double>::max();
@@ -28,37 +27,24 @@ int encontrarVerticeMenorDistancia(const vector<double> &distancias, const set<i
     return verticeMenorDistancia;
 }
 
-void imprimirSolucao(const vector<double> &distancias, const vector<int> &antecessores, int origem) {
-    cout << "Distâncias e caminhos mínimos a partir do vértice " << origem << ":\n";
+void gravarSolucao(const vector<double> &distancias, int origem, std::ofstream &resultadosArquivo) {
+    resultadosArquivo << "------------------------------------------" << endl;
+    resultadosArquivo << "Distâncias mínimas a partir do vértice " << origem << ":\n";
+    resultadosArquivo << "------------------------------------------" << endl;
 
-    for (int i = 1; i < numeroVerticesGrafo; i++) {
-        if (i == origem)
-            continue;
-
-        cout << origem << " para " << i << ": ";
-        int verticeAtual = i;
-        vector<int> caminho;
-        caminho.push_back(verticeAtual);
-
-        while (antecessores[verticeAtual] != -1) {
-            caminho.push_back(antecessores[verticeAtual]);
-            verticeAtual = antecessores[verticeAtual];
+    resultadosArquivo << left << setw(10) << "Vértice" << "Distância da Origem" << endl;
+    for (int i = 0; i < numeroVerticesGrafo; i++) {
+        resultadosArquivo << left << setw(10) << i;
+        if (distancias[i] == numeric_limits<double>::max()) {
+            resultadosArquivo << "Não há caminho do vértice " << origem << " para o vértice " << i << endl;
+        } else {
+            resultadosArquivo << fixed << setprecision(1) << distancias[i] << endl;
         }
-
-        for (int j = caminho.size() - 1; j >= 0; j--) {
-            cout << caminho[j];
-            if (j > 0) {
-                cout << " -> ";
-            }
-        }
-
-        cout << " (Distância: " << fixed << setprecision(1) << distancias[i] << ")" << endl;
     }
 }
 
-void dijkstraMatrizAdjacencia(int origem) {
+void dijkstra(vector<vector<double>> &grafo, int origem, std::ofstream &resultadosArquivo) {
     vector<double> distancias(numeroVerticesGrafo, numeric_limits<double>::max());
-    vector<int> antecessores(numeroVerticesGrafo, -1);
     set<int> naoVisitados;
 
     distancias[origem] = 0;
@@ -72,131 +58,77 @@ void dijkstraMatrizAdjacencia(int origem) {
         naoVisitados.erase(u);
 
         for (int v = 0; v < numeroVerticesGrafo; v++) {
-            if (matrizAdjacencia[u][v] > 0) {
-                double distanciaTotal = distancias[u] + matrizAdjacencia[u][v];
+            if (grafo[u][v] > 0) {
+                double distanciaTotal = distancias[u] + grafo[u][v];
                 if (distanciaTotal < distancias[v]) {
                     distancias[v] = distanciaTotal;
-                    antecessores[v] = u;
                 }
             }
         }
     }
 
-    imprimirSolucao(distancias, antecessores, origem);
-}
-
-void dijkstraListaAdjacencia(int origem) {
-    vector<double> distancias(numeroVerticesGrafo, numeric_limits<double>::max());
-    vector<int> antecessores(numeroVerticesGrafo, -1);
-    set<int> naoVisitados;
-
-    distancias[origem] = 0;
-
-    for (int i = 0; i < numeroVerticesGrafo; i++) {
-        naoVisitados.insert(i);
-    }
-
-    while (!naoVisitados.empty()) {
-        int u = encontrarVerticeMenorDistancia(distancias, naoVisitados);
-        naoVisitados.erase(u);
-
-        for (const pair<int, double> &vizinho : listaAdjacencia[u]) {
-            int v = vizinho.first;
-            double peso = vizinho.second;
-
-            double distanciaTotal = distancias[u] + peso;
-            if (distanciaTotal < distancias[v]) {
-                distancias[v] = distanciaTotal;
-                antecessores[v] = u;
-            }
-        }
-    }
-
-    imprimirSolucao(distancias, antecessores, origem);
+    gravarSolucao(distancias, origem, resultadosArquivo);
 }
 
 int main() {
     std::locale::global(std::locale("C"));
-    ifstream arquivo("entrada.txt");
+    std::ifstream arquivo("entrada.txt");
     bool pesoNegativoEncontrado = false;
 
     if (arquivo.is_open()) {
-        string linha;
-        getline(arquivo, linha);
+        std::string linha;
+        std::getline(arquivo, linha);
         numeroVerticesGrafo = stoi(linha) + 1;
 
-        int escolha;
-        cout << "Escolha a representação do grafo (1 - Matriz de Adjacência, 2 - Lista de Adjacência): ";
-        cin >> escolha;
+        // matriz de adjacencia
+        vector<vector<double>> grafo(numeroVerticesGrafo, vector<double>(numeroVerticesGrafo, 0.0));
 
-        if (escolha == 1) {
-            matrizAdjacencia.assign(numeroVerticesGrafo, vector<double>(numeroVerticesGrafo, 0.0));
-            while (getline(arquivo, linha)) {
-                istringstream iss(linha);
-                int origem, destino;
-                double peso;
+        while (std::getline(arquivo, linha)) {
+            std::istringstream iss(linha);
+            int origem, destino;
+            double peso;
 
-                if (!(iss >> origem >> destino >> peso)) {
-                    cerr << "Erro ao ler o arquivo." << endl;
-                    return 1;
-                }
-
-                if (peso < 0) {
-                    pesoNegativoEncontrado = true;
-                    break;
-                }
-
-                matrizAdjacencia[origem][destino] = peso;
-                matrizAdjacencia[destino][origem] = peso;
+            if (!(iss >> origem >> destino >> peso)) {
+                std::cerr << "Erro ao ler o arquivo." << std::endl;
+                return 1;
             }
-        } else if (escolha == 2) {
-            listaAdjacencia.assign(numeroVerticesGrafo, vector<pair<int, double>>());
-            while (getline(arquivo, linha)) {
-                istringstream iss(linha);
-                int origem, destino;
-                double peso;
 
-                if (!(iss >> origem >> destino >> peso)) {
-                    cerr << "Erro ao ler o arquivo." << endl;
-                    return 1;
-                }
-
-                if (peso < 0) {
-                    pesoNegativoEncontrado = true;
-                    break;
-                }
-
-                listaAdjacencia[origem].push_back({destino, peso});
-                listaAdjacencia[destino].push_back({origem, peso});
+            if (peso < 0) {
+                pesoNegativoEncontrado = true;
+                break;
             }
-        } else {
-            cout << "Escolha inválida." << endl;
-            return 1;
+
+            grafo[origem][destino] = peso;
+            grafo[destino][origem] = peso;
         }
-
         arquivo.close();
 
-        cout << "Algoritmo de Dijkstra para encontrar caminhos mínimos em um grafo." << endl;
+        std::ofstream resultadosArquivo("resultados.txt");
 
-        if (pesoNegativoEncontrado) {
-            cout << "Aviso: A biblioteca ainda não implementa caminhos mínimos com pesos negativos." << endl;
-        } else {
-            cout << "Nenhum peso negativo encontrado no grafo." << endl;
-            int origemDijkstra = 1;
+        if (resultadosArquivo.is_open()) {
+            if (pesoNegativoEncontrado) {
+                resultadosArquivo << "Aviso: A biblioteca ainda não implementa caminhos mínimos com pesos negativos." << std::endl;
+            } else {
+                resultadosArquivo << "Nenhum peso negativo encontrado no grafo." << std::endl;
+                int origemDijkstra = 1;
 
-            if (escolha == 1) {
-                cout << "------------------------------------------" << endl;
-                cout << "Distância e caminho mínimo a partir do vértice " << origemDijkstra << " usando matriz de adjacência:\n";
-                cout << "------------------------------------------" << endl;
-                dijkstraMatrizAdjacencia(origemDijkstra);
-            } else if (escolha == 2) {
-                cout << "Distância e caminho mínimo a partir do vértice " << origemDijkstra << " usando lista de adjacência:\n";
-                dijkstraListaAdjacencia(origemDijkstra);
+                // Medir o tempo de execução
+                auto start_time = chrono::high_resolution_clock::now();
+                dijkstra(grafo, origemDijkstra, resultadosArquivo);
+                auto end_time = chrono::high_resolution_clock::now();
+                auto duration = chrono::duration_cast<chrono::microseconds>(end_time - start_time);
+
+                resultadosArquivo << "Tempo de execução: " << duration.count() << " microssegundos" << endl;
             }
+
+            resultadosArquivo.close();
+        } else {
+            std::cerr << "Erro ao criar o arquivo de resultados." << std::endl;
         }
     } else {
-        cerr << "Erro ao abrir o arquivo." << endl;
+        std::cerr << "Erro ao abrir o arquivo." << std::endl;
     }
 
+    std::cout << "O programa foi executado com sucesso. Os resultados foram salvos no arquivo 'resultados.txt'." << std::endl;
     return 0;
 }
