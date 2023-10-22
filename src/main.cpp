@@ -230,8 +230,12 @@ double DistanciaPesquisadores(vector<double> distancias, string autor) {
         //Checa se é o autor procurado
         if (nome == autor) {
             int índice = stoi(vertice);
+
+            arquivoAutores.close();
             return distancias[índice];
         }
+
+        arquivoAutores.close();
     }
 
 
