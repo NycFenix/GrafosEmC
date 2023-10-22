@@ -210,3 +210,29 @@ int main() {
     cout << "O programa foi executado com sucesso.'." << endl;
     return 0;
 }
+
+
+// função que recebe o vetor de distâncias e o autor desejado e retorna a posição do autor no vetor
+
+double DistanciaPesquisadores(vector<double> distancias, string autor) {
+    locale::global(locale("C"));
+    ifstream arquivoAutores;
+    arquivoAutores.open("/home/karen/Documentos/Teoria dos grafos/GrafosEmC/estudo de caso/rede_colaboracao_vertices");
+    size_t virgula;
+    string linha;
+
+    while(getline(arquivoAutores, linha)) {
+
+        // Separa o vertice e o autor
+        string vertice = linha.substr(0, virgula = linha.find(","));
+        string nome = linha.substr(virgula + 1);
+
+        //Checa se é o autor procurado
+        if (nome == autor) {
+            int índice = stoi(vertice);
+            return distancias[índice];
+        }
+    }
+
+
+}
