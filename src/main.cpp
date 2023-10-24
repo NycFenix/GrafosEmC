@@ -193,7 +193,8 @@ void calcularDistanciaTodos(const vector<vector<Grafo>> &grafo, int origem, cons
     //COM HEAP e SEM HEAP - TODOS OS VERTICES - APENAS DISTANCIA
     ofstream arquivo(nome_arquivo);
 
-    double segundos_totais;
+    double tempo_execucao;
+    double total;
 
     // Inicializa o gerador de números aleatórios com uma semente
     std::random_device rd;
@@ -206,12 +207,14 @@ void calcularDistanciaTodos(const vector<vector<Grafo>> &grafo, int origem, cons
     // Crie uma distribuição uniforme dentro do intervalo
     std::uniform_int_distribution<int> distribution(min, max);
 
+    auto tempo_inicio_distancia = chrono::high_resolution_clock::now();
+
     //Gera números aleatórios dentro do intervalo
-    for (int i = 1; i < numeroVerticesGrafo/2; i++) {
+    for (int i = 1; i < 100; i++) {
         int random_number = distribution(gen);
         std::cout << "Número aleatório " << i+1 << ": " << random_number << std::endl;
 
-        auto tempo2_inicio_distancia = chrono::high_resolution_clock::now();
+        
         arquivo << "------------------------------------------" << endl;
         arquivo << "Origem Vértice " << random_number << ":\n";
         arquivo << "------------------------------------------" << endl;
@@ -230,15 +233,16 @@ void calcularDistanciaTodos(const vector<vector<Grafo>> &grafo, int origem, cons
             }
         }
         
-        auto tempo_final_distancia2 = chrono::high_resolution_clock::now();
-        auto duracao2 = chrono::duration_cast<chrono::seconds>(tempo_final_distancia2 - tempo2_inicio_distancia);
-        segundos_totais += duracao2.count(); 
-        arquivo << "Tempo de execução: " << segundos_totais << " segundos" << endl;
+        auto tempo_final_distancia = chrono::high_resolution_clock::now();
+        auto duracao = chrono::duration_cast<chrono::seconds>(tempo_final_distancia - tempo_inicio_distancia);
+        tempo_execucao = duracao.count(); 
+        total += tempo_execucao;
+        arquivo << "Tempo de execução: " << tempo_execucao << " segundos" << endl;
     }
-    arquivo << "Tempo total de execução: " << segundos_totais << " segundos" << endl;
-    double media_amostral = segundos_totais / numeroVerticesGrafo/2;
+    arquivo << "Tempo total de execução: " << total << " segundos" << endl;
+    double media_amostral = (total / 100);
     arquivo << "Média Amostral: " << media_amostral << " segundos por amostra" << std::endl;
-    std::cout << "Média Amostral: " << media_amostral << " segundos por amostra" << std::endl;
+    std::cout << "Média Amostral: " << media_amostral << " segundos por amostra" << std::endl; //print no terminal para fins de teste
 
 }
 
@@ -248,7 +252,7 @@ void calcularDistanciaTodos(const vector<vector<Grafo>> &grafo, int origem, cons
 int main() {
 
     locale::global(locale("C"));
-    ifstream arquivo("entrada.txt");
+    ifstream arquivo("/home/karen/Documentos/Teoria dos grafos/GrafosEmC/estudo de caso/grafo_W_1.txt");
 
     if (arquivo.is_open()) {
         string linha;
@@ -282,13 +286,13 @@ int main() {
 
         //========================================ESTUDO DE CASO========================================
 
-        vector<int> destinos = {2, 3, 4, 5};
-        int origem = 1;
+        vector<int> destinos = {20, 30, 40, 50, 60};
+        int origem = 10;
 
-        calcularDistanciaIntervalo(grafo, origem, destinos, "caso1_distancia_intervalo_heap.txt",true); //com heap
-        calcularCaminhoIntervalo(grafo, origem, destinos, "caso1_caminho_intervalo_heap.txt",true); //com heap
+        //calcularDistanciaIntervalo(grafo, origem, destinos, "caso1_distancia_intervalo_heap.txt",true); //com heap
+        //calcularCaminhoIntervalo(grafo, origem, destinos, "caso1_caminho_intervalo_heap.txt",true); //com heap
         calcularDistanciaTodos(grafo, origem, "caso2_distancia_intervalo_heap.txt",true); //com heap
-        calcularDistanciaTodos(grafo, origem, "caso2_distancia_intervalo_sem_heap.txt",false); //sem heap
+        //calcularDistanciaTodos(grafo, origem, "caso2_distancia_intervalo_sem_heap.txt",false); //sem heap
         
     } else {
         cerr << "Erro ao abrir o arquivo." << endl;
@@ -301,29 +305,29 @@ int main() {
 
 // função que recebe o vetor de distâncias e o autor desejado e retorna a posição do autor no vetor
 
-// double DistanciaPesquisadores(vector<double> distancias, string autor) {
-//     locale::global(locale("C"));
-//     ifstream arquivoAutores;
-//     arquivoAutores.open("entrada");
-//     size_t virgula;
-//     string linha;
+double DistanciaPesquisadores(vector<double> distancias, string autor) {
+    locale::global(locale("C"));
+    ifstream arquivoAutores;
+    arquivoAutores.open("entrada");
+    size_t virgula;
+    string linha;
 
-//     while(getline(arquivoAutores, linha)) {
+    while(getline(arquivoAutores, linha)) {
 
-//         // Separa o vertice e o autor
-//         string vertice = linha.substr(0, virgula = linha.find(","));
-//         string nome = linha.substr(virgula + 1);
+        // Separa o vertice e o autor
+        string vertice = linha.substr(0, virgula = linha.find(","));
+        string nome = linha.substr(virgula + 1);
 
-//         //Checa se é o autor procurado
-//         if (nome == autor) {
-//             int índice = stoi(vertice);
+        //Checa se é o autor procurado
+        if (nome == autor) {
+            int índice = stoi(vertice);
 
-//             arquivoAutores.close();
-//             return distancias[índice];
-//         }
+            arquivoAutores.close();
+            return distancias[índice];
+        }
 
-//         arquivoAutores.close();
-//     }
+        arquivoAutores.close();
+    }
 
 
-// }
+}
