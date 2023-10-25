@@ -9,7 +9,7 @@
 #include <set>
 #include <chrono>
 #include <queue>
-#include <algorithm> // Adicione esta linha para incluir a biblioteca de algoritmos.
+#include <algorithm>
 #include <random>
 
 using namespace std;
@@ -136,35 +136,33 @@ DijkstraResult dijkstra(const vector<vector<Grafo>> &grafo, int origem) {
 
 
 void calcularDistanciaIntervalo(const vector<vector<Grafo>> &grafo, int origem, vector<int> destinos, const std::string& nome_arquivo, bool heap){
-    //COM HEAP - ORIGEM e DESTINO DEFINIDOS - APENAS DISTANCIA
-        ofstream arquivo(nome_arquivo);
+    ofstream arquivo(nome_arquivo);
 
-        auto tempo_inicio_distancia_heap = chrono::high_resolution_clock::now();
-        arquivo << "------------------------------------------" << endl;
-        arquivo << "Origem Vértice " << origem << ":\n";
-        arquivo << "------------------------------------------" << endl;
-   
-        for (int destino : destinos) {
-            DijkstraResult resultado = heap ? dijkstraHeap(grafo, origem) : dijkstra(grafo, origem);
-            arquivo << left << setw(10) << destino;
-            if (resultado.distancias[destino] == numeric_limits<double>::max()) {
-                arquivo << setw(25) << "N/A" << endl;
-            } else {
-                arquivo << fixed << setw(25) << setprecision(1) << resultado.distancias[destino];
-            arquivo << endl;
-            }
+    auto tempo_inicio_distancia_heap = chrono::high_resolution_clock::now();
+    arquivo << "------------------------------------------" << endl;
+    arquivo << "Origem Vértice " << origem << ":\n";
+    arquivo << "------------------------------------------" << endl;
+
+    for (int destino : destinos) {
+        DijkstraResult resultado = heap ? dijkstraHeap(grafo, origem) : dijkstra(grafo, origem);
+        arquivo << left << setw(10) << destino;
+        if (resultado.distancias[destino] == numeric_limits<double>::max()) {
+            arquivo << setw(25) << "N/A" << endl;
+        } else {
+            arquivo << fixed << setw(25) << setprecision(1) << resultado.distancias[destino];
+        arquivo << endl;
         }
-        auto tempo_final_distancia_heap = chrono::high_resolution_clock::now();
-        auto duracao_distancia_heap = chrono::duration_cast<chrono::microseconds>(tempo_final_distancia_heap - tempo_inicio_distancia_heap);
-        double segundos_distancia_heap = duracao_distancia_heap.count() / 1000000.0;
-        arquivo << "Tempo de execução: " << segundos_distancia_heap << " segundos" << endl;
-        arquivo.close();
+    }
+    auto tempo_final_distancia_heap = chrono::high_resolution_clock::now();
+    auto duracao_distancia_heap = chrono::duration_cast<chrono::microseconds>(tempo_final_distancia_heap - tempo_inicio_distancia_heap);
+    double segundos_distancia_heap = duracao_distancia_heap.count() / 1000000.0;
+    arquivo << "Tempo de execução: " << segundos_distancia_heap << " segundos" << endl;
+    arquivo.close();
 
 }
 
 
 void calcularCaminhoIntervalo(const vector<vector<Grafo>> &grafo, int origem, vector<int> destinos, const std::string& nome_arquivo, bool heap){
-    //COM HEAP - ORIGEM e DESTINO DEFINIDOS - APENAS CAMINHO
     ofstream arquivo(nome_arquivo);
     DijkstraResult resultado = heap ? dijkstraHeap(grafo, origem) : dijkstra(grafo, origem);
     arquivo << "------------------------------------------" << endl;
@@ -190,8 +188,7 @@ void calcularCaminhoIntervalo(const vector<vector<Grafo>> &grafo, int origem, ve
 }
 
 void calcularDistanciaTodos(const vector<vector<Grafo>> &grafo, int origem, const std::string& nome_arquivo, bool heap){
-    //COM HEAP e SEM HEAP - TODOS OS VERTICES - APENAS DISTANCIA
-    ofstream arquivo(nome_arquivo);
+    //ofstream arquivo(nome_arquivo);
 
     double tempo_execucao;
     double total;
@@ -212,47 +209,108 @@ void calcularDistanciaTodos(const vector<vector<Grafo>> &grafo, int origem, cons
     //Gera números aleatórios dentro do intervalo
     for (int i = 1; i < 100; i++) {
         int random_number = distribution(gen);
-        std::cout << "Número aleatório " << i+1 << ": " << random_number << std::endl;
+        // std::cout << "Número aleatório " << i+1 << ": " << random_number << std::endl;
 
         
-        arquivo << "------------------------------------------" << endl;
-        arquivo << "Origem Vértice " << random_number << ":\n";
-        arquivo << "------------------------------------------" << endl;
+        // arquivo << "------------------------------------------" << endl;
+        // arquivo << "Origem Vértice " << random_number << ":\n";
+        // arquivo << "------------------------------------------" << endl;
 
         
         DijkstraResult resultados = heap ? dijkstraHeap(grafo, random_number) : dijkstra(grafo, random_number);
     
-        arquivo << left << setw(10) << "Vértice" << setw(25) << "Distância da Origem"<< endl;
-        for (int i = 1; i < numeroVerticesGrafo; i++) {
-            arquivo << left << setw(10) << i;
-            if (resultados.distancias[i] == numeric_limits<double>::max()) {
-                arquivo << setw(25) << "N/A" << endl;
-            } else {
-                arquivo << fixed << setw(25) << setprecision(1) << resultados.distancias[i];
-                arquivo << endl;
-            }
-        }
+        // arquivo << left << setw(10) << "Vértice" << setw(25) << "Distância da Origem"<< endl;
+        // for (int i = 1; i < numeroVerticesGrafo; i++) {
+        //     arquivo << left << setw(10) << i;
+        //     if (resultados.distancias[i] == numeric_limits<double>::max()) {
+        //         arquivo << setw(25) << "N/A" << endl;
+        //     } else {
+        //         arquivo << fixed << setw(25) << setprecision(1) << resultados.distancias[i];
+        //         arquivo << endl;
+        //     }
+        // }
         
         auto tempo_final_distancia = chrono::high_resolution_clock::now();
         auto duracao = chrono::duration_cast<chrono::seconds>(tempo_final_distancia - tempo_inicio_distancia);
         tempo_execucao = duracao.count(); 
         total += tempo_execucao;
-        arquivo << "Tempo de execução: " << tempo_execucao << " segundos" << endl;
+        // arquivo << "Tempo de execução: " << tempo_execucao << " segundos" << endl;
     }
-    arquivo << "Tempo total de execução: " << total << " segundos" << endl;
     double media_amostral = (total / 100);
-    arquivo << "Média Amostral: " << media_amostral << " segundos por amostra" << std::endl;
+    // arquivo << "Tempo total de execução: " << total << " segundos" << endl;
+    // arquivo << "Média Amostral: " << media_amostral << " segundos por amostra" << std::endl;
+
+    std::cout  << "Tempo total de execução: " << total << " segundos" << endl;    
     std::cout << "Média Amostral: " << media_amostral << " segundos por amostra" << std::endl; //print no terminal para fins de teste
 
 }
 
+void calcularDistanciaPesquisadores(const vector<vector<Grafo>> &grafo) {
+    
+    unordered_map<string, int> nomeParaIndice;
+    unordered_map<int, string> indiceParaNome;
 
+    ifstream arquivoNomes("../estudo de caso/rede_colaboracao_vertices.txt"); // Abre o arquivo que contém o mapeamento entre nomes e índices
+
+    if (arquivoNomes.is_open()) {
+        string linha;
+        while (getline(arquivoNomes, linha)) {
+            size_t pos = linha.find(",");
+
+            if (pos != std::string::npos) {
+                // Extrai o número e o nome com base na posição da vírgula
+                int indice = std::stoi(linha.substr(0, pos));
+                std::string nome = linha.substr(pos + 1);
+                nomeParaIndice[nome] = indice;
+                indiceParaNome[indice] = nome;
+            }
+        }
+        arquivoNomes.close();
+
+        // Define os pesquisadores de origem e destino
+        int origem = nomeParaIndice["Edsger W. Dijkstra"];
+        vector<string> pesquisadoresDestino = {
+            "Alan M. Turing",
+            "J. B. Kruskal",
+            "Jon M. Kleinberg",
+            "Eva Tardos",
+            "Daniel R. Figueiredo"
+        };
+
+        for (const string &pesquisadorDestino : pesquisadoresDestino) {
+            int destino = nomeParaIndice[pesquisadorDestino];
+
+            // Calcula a distância entre a origem e o pesquisador de destino
+            DijkstraResult resultado = dijkstraHeap(grafo, origem);
+
+            // Verifica se a distância é válida (menor que o valor máximo)
+            if (resultado.distancias[destino] < numeric_limits<double>::max()) {
+                cout << "Distância entre " << indiceParaNome[origem] << " e " << indiceParaNome[destino] << ": " << resultado.distancias[destino] << endl;
+
+                // Calcula e imprime o caminho mínimo
+                vector<int> caminhoMinimo = encontrarCaminhoMinimo(resultado.pais, origem, destino);
+                cout << "Caminho mínimo: ";
+                for (int i = 0; i < caminhoMinimo.size(); i++) {
+                    cout << indiceParaNome[caminhoMinimo[i]];
+                    if (i < caminhoMinimo.size() - 1) {
+                        cout << " -> ";
+                    }
+                }
+                cout << endl;
+            } else {
+                cout << "Não há caminho válido entre " << indiceParaNome[origem] << " e " << indiceParaNome[destino] << endl;
+            }
+        }
+    }
+}
 
 
 int main() {
 
     locale::global(locale("C"));
-    ifstream arquivo("/home/karen/Documentos/Teoria dos grafos/GrafosEmC/estudo de caso/grafo_W_1.txt");
+
+    //para estudo de caso 1 e 2 abrir os grafos disponibilizados no site, para o caso 3 abrir arquivo da rede de colaboradores
+    ifstream arquivo("../estudo de caso/rede_colaboracao.txt");
 
     if (arquivo.is_open()) {
         string linha;
@@ -291,8 +349,9 @@ int main() {
 
         //calcularDistanciaIntervalo(grafo, origem, destinos, "caso1_distancia_intervalo_heap.txt",true); //com heap
         //calcularCaminhoIntervalo(grafo, origem, destinos, "caso1_caminho_intervalo_heap.txt",true); //com heap
-        calcularDistanciaTodos(grafo, origem, "caso2_distancia_intervalo_heap.txt",true); //com heap
+        //calcularDistanciaTodos(grafo, origem, "caso2_distancia_intervalo_heap.txt",true); //com heap
         //calcularDistanciaTodos(grafo, origem, "caso2_distancia_intervalo_sem_heap.txt",false); //sem heap
+        calcularDistanciaPesquisadores(grafo);
         
     } else {
         cerr << "Erro ao abrir o arquivo." << endl;
@@ -303,31 +362,3 @@ int main() {
 }
 
 
-// função que recebe o vetor de distâncias e o autor desejado e retorna a posição do autor no vetor
-
-double DistanciaPesquisadores(vector<double> distancias, string autor) {
-    locale::global(locale("C"));
-    ifstream arquivoAutores;
-    arquivoAutores.open("entrada");
-    size_t virgula;
-    string linha;
-
-    while(getline(arquivoAutores, linha)) {
-
-        // Separa o vertice e o autor
-        string vertice = linha.substr(0, virgula = linha.find(","));
-        string nome = linha.substr(virgula + 1);
-
-        //Checa se é o autor procurado
-        if (nome == autor) {
-            int índice = stoi(vertice);
-
-            arquivoAutores.close();
-            return distancias[índice];
-        }
-
-        arquivoAutores.close();
-    }
-
-
-}
