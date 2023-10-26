@@ -139,3 +139,38 @@ class Fila {
         return saida;
     }
 };
+
+
+
+
+struct NodoFibonnachi{
+    int data;
+    NodoFibonnachi* pai;
+    NodoFibonnachi* filho;
+    NodoFibonnachi* esquerda;
+    NodoFibonnachi* direita;
+    int grau;
+    bool marcado;
+    NodoFibonnachi(int valor): data(valor), pai(nullptr), filho(nullptr), esquerda(nullptr), direita(nullptr), grau(0), marcado(false) {}
+};
+
+
+class FibonnachiHeap{
+    private:
+        // atributos
+        NodoFibonnachi* minimo;
+        int tamanho;
+
+        // metodos a serem definidos
+        NodoFibonnachi *insert(int valor);
+        NodoFibonnachi *merge(NodoFibonnachi *a, NodoFibonnachi *b);
+        NodoFibonnachi *getMin();
+        NodoFibonnachi *deleteMin(NodoFibonnachi *);
+        NodoFibonnachi *deleteValue(int valor);
+        void cut(NodoFibonnachi *nodo, NodoFibonnachi *pai);
+
+    public:
+        
+        
+
+};
