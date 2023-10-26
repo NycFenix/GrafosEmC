@@ -11,7 +11,8 @@
 #include <queue>
 #include <algorithm>
 #include <random>
-
+#include <PilhaeFilha.hpp>
+#include <Grafo.hpp>
 using namespace std;
 
 
@@ -22,11 +23,6 @@ struct DijkstraResult {
 
 int numeroVerticesGrafo;
 
-struct Grafo {
-    int destino;
-    double peso;
-    Grafo(int d, double p) : destino(d), peso(p) {}
-};
 
 // Função para encontrar o caminho mínimo entre 2 vertices com base nas informações de distâncias mínimas do algoritmo de Dijkstra
 vector<int> encontrarCaminhoMinimo(const vector<int> &pais, int origem, int destino) {
